@@ -1,14 +1,12 @@
 {
-    "name": "electron-quick-start",
+    "name": "ph-discord-activity-overlay",
     "version": "1.0.0",
     "description": "A minimal Electron application",
     "main": "dist/main.js",
     "scripts": {
-        "build": "webpack",
         "electron:dev": "nodemon",
         "dev": "concurrently --kill-others \"npm run electron:dev\"",
-        "start": "npm run build && electron dist/main.js",
-        "pack": "electron-builder --win=portable"
+        "build:win": "electron-builder --win=portable"
     },
     "repository": "https://github.com/electron/electron-quick-start",
     "keywords": [
@@ -52,6 +50,7 @@
         },
         "directories": {
             "output": "out"
-        }
+        },
+        "files": ["**/*", "dist/assets/*"]
     }
 }
