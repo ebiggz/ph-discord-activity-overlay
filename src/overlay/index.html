@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>Potion Hoarders Voice Activity Overlay</title>
+
+        <style>
+            html,
+            body {
+                height: 100vh;
+                width: 100vw;
+                padding: 0;
+                margin: 0;
+            }
+            #app {
+                width: 100vw;
+                height: 100vh;
+                padding: 10px;
+                box-sizing: border-box;
+                display: flex;
+            }
+            #app.left {
+                justify-content: flex-start;
+            }
+            #app.right {
+                justify-content: flex-end;
+            }
+            #app.top {
+                align-items: flex-start;
+            }
+            #app.bottom {
+                align-items: flex-end;
+            }
+            .goblins-wrapper {
+                display: flex;
+            }
+            .goblins-wrapper.vertical {
+                flex-direction: column;
+                align-items: center;
+            }
+            .goblins-wrapper.horizontal {
+                flex-direction: row;
+            }
+            .user-container {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                opacity: 0.75;
+            }
+            .user-container > img {
+                height: 65px;
+            }
+            .user-container > div {
+                padding: 4px;
+                color: white;
+                font-family: sans-serif;
+                background: rgba(0, 0, 0, 0.5);
+                border-radius: 4px;
+            }
+            .user-container.speaking {
+                opacity: 1;
+                filter: drop-shadow(0px 0px 9px #1a97d4);
+            }
+            .user-container.viewed > img {
+                height: 75px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div
+            id="app"
+            :class="[settings.positionVertical, settings.positionHorizontal]"
+        >
+            <div class="goblins-wrapper" :class="settings.alignment">
+                <user
+                    v-for="user in users"
+                    :user="user"
+                    :viewed-user="settings.viewedUser"
+                />
+            </div>
+        </div>
+        <script src="./js/vue.min.js"></script>
+        <script src="./js/reconnecting-websocket.js"></script>
+        <script src="./js/main.js"></script>
+    </body>
+</html>

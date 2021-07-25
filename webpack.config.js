@@ -29,7 +29,10 @@ module.exports = {
     },
     plugins: [
         new CopyPlugin({
-            patterns: [{ from: "src/assets", to: "assets" }],
+            patterns: [
+                { from: "src/assets", to: "assets" },
+                { from: "src/overlay", to: "overlay" },
+            ],
         }),
     ],
     externals: [nodeExternals()],

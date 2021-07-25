@@ -1,27 +1,21 @@
-import { app, Tray, Menu, nativeImage } from "electron";
+import { app, Tray, Menu, nativeImage, dialog } from "electron";
+import { HOARDERS } from "./constants";
+import { settingsManager } from "./SettingsManager";
 
 export class TrayMenu {
-    // Create a variable to store our tray
-    // Public: Make it accessible outside of the class;
-    // Readonly: Value can't be changed
     public readonly tray: Tray;
 
-    // Path where should we fetch our icon;
     private iconPath: string = "/assets/iconTemplate.png";
 
     constructor() {
         this.tray = new Tray(this.createNativeImage());
         this.tray.setContextMenu(this.createMenu());
-        // this.tray.setToolTip('Deskink')
+        this.tray.setToolTip("PH Voice Overlay");
     }
 
     createNativeImage() {
-        // Since we never know where the app is installed,
-        // we need to add the app base path to it.
         const path = `${app.getAppPath()}${this.iconPath}`;
-        console.log(path);
         const image = nativeImage.createFromPath(path);
-        // Marks the image as a template image.
         image.setTemplateImage(true);
         return image;
     }
@@ -29,11 +23,106 @@ export class TrayMenu {
     createMenu(): Menu {
         const contextMenu = Menu.buildFromTemplate([
             {
-                label: "Copy Overlay URL",
+                label: "Show Overlay URL",
                 type: "normal",
                 click: () => {
-                    /* Later this will open the Main Window */
+                    dialog.showMessageBox({
+                        message: "http://localhost:8923/overlay/",
+                        type: "info",
+                        title: "URL for Browser Source:",
+                        detail: "Make sure to set browser source dimensions to same size as canvas, ie 1280x720",
+                    });
                 },
+            },
+            {
+                label: "Set User View",
+                toolTip: "Set which user the stream is seeing the view of",
+                submenu: HOARDERS.map((h) => ({
+                    label: h.label,
+                    type: "radio",
+                    checked: settingsManager.get("viewedUser") === h.id,
+                    click: () => {
+                        settingsManager.set("viewedUser", h.id);
+                    },
+                })),
+            },
+            {
+                label: "Avatar Position",
+                submenu: [
+                    {
+                        label: "Top Left",
+                        type: "radio",
+                        checked:
+                            settingsManager.get("positionVertical") === "top" &&
+                            settingsManager.get("positionHorizontal") ===
+                                "left",
+                        click: () => {
+                            settingsManager.set("positionVertical", "top");
+                            settingsManager.set("positionHorizontal", "left");
+                        },
+                    },
+                    {
+                        label: "Top Right",
+                        type: "radio",
+                        checked:
+                            settingsManager.get("positionVertical") === "top" &&
+                            settingsManager.get("positionHorizontal") ===
+                                "right",
+                        click: () => {
+                            settingsManager.set("positionVertical", "top");
+                            settingsManager.set("positionHorizontal", "right");
+                        },
+                    },
+                    {
+                        label: "Bottom Left",
+                        type: "radio",
+                        checked:
+                            settingsManager.get("positionVertical") ===
+                                "bottom" &&
+                            settingsManager.get("positionHorizontal") ===
+                                "left",
+                        click: () => {
+                            settingsManager.set("positionVertical", "bottom");
+                            settingsManager.set("positionHorizontal", "left");
+                        },
+                    },
+                    {
+                        label: "Bottom Right",
+                        type: "radio",
+                        checked:
+                            settingsManager.get("positionVertical") ===
+                                "bottom" &&
+                            settingsManager.get("positionHorizontal") ===
+                                "right",
+                        click: () => {
+                            settingsManager.set("positionVertical", "bottom");
+                            settingsManager.set("positionHorizontal", "right");
+                        },
+                    },
+                ],
+            },
+            {
+                label: "Avatar Alignment",
+                submenu: [
+                    {
+                        label: "Vertical",
+                        type: "radio",
+                        checked:
+                            settingsManager.get("alignment") === "vertical",
+                        click: () => {
+                            settingsManager.set("alignment", "vertical");
+                        },
+                    },
+                    {
+                        label: "Horizontal",
+                        type: "radio",
+                        checked:
+                            settingsManager.get("alignment") === "horizontal",
+                        click: () => {
+                            settingsManager.set("alignment", "horizontal");
+                        },
+                    },
+                ],
             },
             {
                 label: "Quit",
