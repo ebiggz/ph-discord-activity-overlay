@@ -1,4 +1,5 @@
 import { app, Tray, Menu, nativeImage, dialog } from "electron";
+import prompt from "electron-prompt";
 import { HOARDERS } from "./constants";
 import { settingsManager } from "./SettingsManager";
 
@@ -26,12 +27,16 @@ export class TrayMenu {
                 label: "Show Overlay URL",
                 type: "normal",
                 click: () => {
-                    dialog.showMessageBox({
-                        message: "http://localhost:8923/overlay/",
-                        type: "info",
-                        title: "URL for Browser Source:",
-                        detail: "Make sure to set browser source dimensions to same size as canvas, ie 1280x720",
-                    });
+                    prompt({
+                        title: 'URL for Browser Source',
+                        label: 'URL:',
+                        value: 'http://localhost:8923/overlay/',
+                        inputAttrs: {
+                            type: 'url',
+                            disabled: true as any
+                        },
+                        type: 'input',
+                    }).then(console.log).catch(console.log)
                 },
             },
             {

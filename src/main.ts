@@ -23,3 +23,7 @@ app.whenReady().then(() => {
 
     discordManager.connect();
 });
+
+app.on("window-all-closed", () => {
+    // do nothing
+});
