@@ -9,7 +9,7 @@
 > Note: App must be running for overlay to function. App will automatically start when Windows does so you don't have to worry about it.
 
 ### Important!
-You must be whitelisted for this app to function properly. Please contact ebiggz on Discord if you haven't recieved a Discord invite via email.
+You must be whitelisted for this app to function properly. Please contact ebiggz on Discord if you haven't received a Discord invite via email.
 
 ## Dev
 
