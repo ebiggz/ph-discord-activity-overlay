@@ -1,7 +1,8 @@
-import { app, Tray, Menu, nativeImage } from "electron";
+import { app, Tray, Menu, nativeImage, dialog } from "electron";
 import log from "electron-log";
 import path from "path";
 import prompt from "electron-prompt";
+import isDev from "electron-is-dev";
 import { HOARDERS } from "./constants";
 import { settingsManager } from "./SettingsManager";
 
@@ -17,8 +18,8 @@ export class TrayMenu {
     createNativeImage() {
         const iconPath =
             process.platform === "win32"
-                ? "/dist/assets/iconTemplateWin.png"
-                : "/dist/assets/iconTemplate.png";
+                ? `${!isDev ? '/dist' : ''}/assets/iconTemplateWin.png`
+                : "/assets/iconTemplate.png";
         const imagePath = path.join(app.getAppPath(), iconPath);
         log.info(imagePath);
         const image = nativeImage.createFromPath(imagePath);
@@ -34,7 +35,7 @@ export class TrayMenu {
                 click: () => {
                     prompt({
                         title: "URL for Browser Source",
-                        label: "URL:",
+                        label: "Copy URL:",
                         value: "http://localhost:8923/overlay/",
                         inputAttrs: {
                             type: "url",
@@ -42,8 +43,14 @@ export class TrayMenu {
                         },
                         type: "input",
                     })
-                        .then(console.log)
-                        .catch(console.log);
+                        .then(() => {})
+                        .catch(() => {})
+                        .finally(() => {
+                            dialog.showMessageBox({
+                                title: "Info",
+                                message: "Make sure to set the Browser Source dimensions to the same as your stream canvas (ie 1280x720)"
+                            });
+                        });
                 },
             },
             {
