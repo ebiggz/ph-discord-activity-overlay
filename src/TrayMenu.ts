@@ -16,7 +16,7 @@ export class TrayMenu {
     createNativeImage() {
         const iconPath =
             process.platform === "win32"
-                ? "/assets/iconTemplateWin.png"
+                ? "/dist/assets/iconTemplateWin.png"
                 : "/dist/assets/iconTemplate.png";
         const imagePath = path.join(app.getAppPath(), iconPath);
         const image = nativeImage.createFromPath(imagePath);
