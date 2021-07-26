@@ -5,7 +5,12 @@ import prompt from "electron-prompt";
 import isDev from "electron-is-dev";
 import { HOARDERS } from "./constants";
 import { settingsManager } from "./SettingsManager";
+import { updateManager } from "./UpdateManager";
 import AutoLaunch from "auto-launch";
+
+interface TrayState {
+    updateReady?: boolean;
+}
 
 export class TrayMenu {
     public readonly tray: Tray;
@@ -14,6 +19,14 @@ export class TrayMenu {
         this.tray = new Tray(this.createNativeImage());
         this.tray.setContextMenu(this.createMenu());
         this.tray.setToolTip("PH Voice Overlay");
+
+        updateManager.on("updateReady", () => {
+            this.tray.setContextMenu(
+                this.createMenu({
+                    updateReady: true,
+                })
+            );
+        });
     }
 
     createNativeImage() {
@@ -28,36 +41,8 @@ export class TrayMenu {
         return image;
     }
 
-    createMenu(): Menu {
+    createMenu(state: TrayState = {}): Menu {
         const contextMenu = Menu.buildFromTemplate([
-            {
-                label: "Show Overlay Path",
-                type: "normal",
-                click: () => {
-                    prompt({
-                        title: "Path for Browser Source",
-                        label: "Copy Path:",
-                        value: path.join(
-                            app.getPath("userData"),
-                            "overlay.html"
-                        ),
-                        inputAttrs: {
-                            type: "url",
-                            disabled: true as any,
-                        },
-                        type: "input",
-                    })
-                        .then(() => {})
-                        .catch(() => {})
-                        .finally(() => {
-                            dialog.showMessageBox({
-                                title: "Info",
-                                message:
-                                    "Make sure to check 'Local File' and set the Browser Source dimensions to the same as your stream canvas (ie 1280x720)",
-                            });
-                        });
-                },
-            },
             {
                 label: "Set User View",
                 toolTip: "Set which user the stream is seeing the view of",
@@ -160,29 +145,82 @@ export class TrayMenu {
                 })),
             },
             {
-                label: "Launch on Startup",
-                toolTip: "Launch the program when Windows starts",
-                type: "checkbox",
-                checked: settingsManager.get("launchOnStartup"),
+                label: "Advanced",
+                submenu: [
+                    {
+                        label: "Launch on Startup",
+                        toolTip: "Launch the program when Windows starts",
+                        type: "checkbox",
+                        checked: settingsManager.get("launchOnStartup"),
+                        click: () => {
+                            const newAutoLaunch =
+                                !settingsManager.get("launchOnStartup");
+                            settingsManager.set(
+                                "launchOnStartup",
+                                newAutoLaunch
+                            );
+
+                            const autoLaunch = new AutoLaunch({
+                                name: "PH Voice Overlay",
+                            });
+
+                            if (newAutoLaunch) {
+                                autoLaunch.enable().catch(log.error);
+                            } else {
+                                autoLaunch.disable().catch(log.error);
+                            }
+                        },
+                    },
+                ],
+            },
+            {
+                type: "separator",
+            },
+            {
+                label: "Show Overlay Path",
+                type: "normal",
                 click: () => {
-                    const newAutoLaunch =
-                        !settingsManager.get("launchOnStartup");
-                    settingsManager.set("launchOnStartup", newAutoLaunch);
-
-                    const autoLaunch = new AutoLaunch({
-                        name: "PH Voice Overlay",
-                    });
-
-                    if (newAutoLaunch) {
-                        autoLaunch.enable().catch(log.error);
-                    } else {
-                        autoLaunch.disable().catch(log.error);
-                    }
+                    prompt({
+                        title: "Path for Browser Source",
+                        label: "Copy Path:",
+                        value: path.join(
+                            app.getPath("userData"),
+                            "overlay.html"
+                        ),
+                        inputAttrs: {
+                            type: "url",
+                            disabled: true as any,
+                        },
+                        type: "input",
+                    })
+                        .then(() => {})
+                        .catch(() => {})
+                        .finally(() => {
+                            dialog.showMessageBox({
+                                title: "Info",
+                                message:
+                                    "Make sure to check 'Local File' and set the Browser Source dimensions to the same as your stream canvas (ie 1280x720)",
+                            });
+                        });
                 },
             },
             {
                 label: "About",
                 role: "about",
+            },
+            {
+                label: state.updateReady
+                    ? "Install update..."
+                    : "Check for updates...",
+                type: "normal",
+                enabled: !isDev,
+                click: () => {
+                    if (state.updateReady) {
+                        updateManager.installUpdate();
+                    } else {
+                        updateManager.checkForUpdate(true);
+                    }
+                },
             },
             {
                 label: "Quit",

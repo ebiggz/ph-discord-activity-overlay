@@ -3,8 +3,8 @@ import { TrayMenu } from "./TrayMenu";
 class AppManager {
     private trayMenu!: TrayMenu;
 
-    setTray(tray: TrayMenu): void {
-        this.trayMenu = tray;
+    setTray(): void {
+        this.trayMenu = new TrayMenu();
     }
 
     getTray(): TrayMenu {
