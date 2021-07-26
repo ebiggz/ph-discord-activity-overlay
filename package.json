@@ -1,14 +1,14 @@
 {
     "name": "ph-discord-activity-overlay",
     "productName": "PotionHoarders Discord Activity Overlay",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Small app which sends discord voice events to an overlay for PotionHoarders",
     "main": "./dist/main.js",
     "scripts": {
         "start": "webpack --config ./webpack.config.js && electron .",
         "electron:dev": "nodemon",
         "dev": "concurrently --kill-others \"npm run electron:dev\"",
-        "build:win": "electron-builder --win -p never",
+        "build": "electron-builder --win -p never",
         "publish": "electron-builder --win -p always"
     },
     "repository": "https://github.com/ebiggz/ph-discord-activity-overlay",

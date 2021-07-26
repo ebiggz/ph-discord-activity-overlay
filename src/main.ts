@@ -26,15 +26,18 @@ log.info('PH Voice Activity starting...');
 
     app.whenReady().then(() => {
 
-        if(!isDev) {
-            autoUpdater.checkForUpdates();
-        }
-
         webServerManager.start();
 
         appManager.setTray(new TrayMenu());
 
         if (!isDev) {
+
+            autoUpdater.checkForUpdates();
+
+            setInterval(() => {
+                autoUpdater.checkForUpdates();
+            }, 60 * 60 * 1000  /* every hour */);
+
             const autoLaunch = new AutoLaunch({
                 name: "PH Voice Overlay"
             });

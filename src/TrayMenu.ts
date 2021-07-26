@@ -1,4 +1,5 @@
-import { app, Tray, Menu, nativeImage, dialog } from "electron";
+import { app, Tray, Menu, nativeImage } from "electron";
+import log from "electron-log";
 import path from "path";
 import prompt from "electron-prompt";
 import { HOARDERS } from "./constants";
@@ -19,6 +20,7 @@ export class TrayMenu {
                 ? "/dist/assets/iconTemplateWin.png"
                 : "/dist/assets/iconTemplate.png";
         const imagePath = path.join(app.getAppPath(), iconPath);
+        log.info(imagePath);
         const image = nativeImage.createFromPath(imagePath);
         image.setTemplateImage(true);
         return image;
