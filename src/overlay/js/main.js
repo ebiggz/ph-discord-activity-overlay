@@ -1,8 +1,14 @@
 Vue.component("user", {
-    props: ["user", "viewedUser"],
+    props: ["user", "viewedUser", "size"],
     template: `
-        <div class="user-container" :class="[{ speaking: user.speaking }, { viewed: isViewed }, user.goblin]">
-            <img :src="imageUrl" /> 
+        <div 
+            class="user-container" 
+            :class="[{ speaking: user.speaking }, { viewed: isViewed }, user.goblin]"
+        >
+            <img 
+                :src="imageUrl"
+                :style="{ height: avatarHeight }" 
+            /> 
             <!-- <div>
                 <h3>{{ user.nick }}</h3>
             </div> -->
@@ -13,6 +19,10 @@ Vue.component("user", {
         },
         isViewed: function () {
             return this.viewedUser === this.user.id;
+        },
+        avatarHeight: function () {
+            const viewedIncrease = this.isViewed ? 0.15 * this.size : 0;
+            return `${this.size + viewedIncrease}px`;
         },
     },
 });
@@ -30,6 +40,7 @@ const app = new Vue({
             positionVertical: "bottom",
             positionHorizontal: "left",
             alignment: "horizontal",
+            size: 65,
         },
     },
     created: function () {

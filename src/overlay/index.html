@@ -50,9 +50,6 @@
                 align-items: center;
                 opacity: 0.75;
             }
-            .user-container > img {
-                height: 65px;
-            }
             .user-container > div {
                 padding: 4px;
                 color: white;
@@ -63,9 +60,6 @@
             .user-container.speaking {
                 opacity: 1;
                 filter: drop-shadow(0px 0px 10px rgb(0, 119, 255));
-            }
-            .user-container.viewed > img {
-                height: 75px;
             }
         </style>
     </head>
@@ -80,6 +74,7 @@
                     v-for="user in users"
                     :user="user"
                     :viewed-user="settings.viewedUser"
+                    :size="settings.size"
                 />
             </div>
         </div>

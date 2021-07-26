@@ -9,6 +9,8 @@ const defaultSettings = {
     positionVertical: "bottom",
     positionHorizontal: "left",
     alignment: "horizontal",
+    size: 65,
+    launchOnStartup: true,
 };
 
 type Settings = {
@@ -40,8 +42,8 @@ class SettingsManager extends TypedEmitter<{
         this.emit("settingsUpdated", this.getAll());
     }
 
-    get(key: keyof Settings) {
-        return this.settings[key] ?? defaultSettings[key];
+    get<K extends keyof Settings>(key: K) {
+        return (this.settings[key] as Settings[K]) ?? defaultSettings[key];
     }
 
     getAll(): Required<Settings> {

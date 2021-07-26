@@ -5,6 +5,7 @@ import prompt from "electron-prompt";
 import isDev from "electron-is-dev";
 import { HOARDERS } from "./constants";
 import { settingsManager } from "./SettingsManager";
+import AutoLaunch from "auto-launch";
 
 export class TrayMenu {
     public readonly tray: Tray;
@@ -18,7 +19,7 @@ export class TrayMenu {
     createNativeImage() {
         const iconPath =
             process.platform === "win32"
-                ? `${!isDev ? '/dist' : ''}/assets/iconTemplateWin.png`
+                ? `${!isDev ? "/dist" : ""}/assets/iconTemplateWin.png`
                 : "/assets/iconTemplate.png";
         const imagePath = path.join(app.getAppPath(), iconPath);
         log.info(imagePath);
@@ -48,7 +49,8 @@ export class TrayMenu {
                         .finally(() => {
                             dialog.showMessageBox({
                                 title: "Info",
-                                message: "Make sure to set the Browser Source dimensions to the same as your stream canvas (ie 1280x720)"
+                                message:
+                                    "Make sure to set the Browser Source dimensions to the same as your stream canvas (ie 1280x720)",
                             });
                         });
                 },
@@ -142,6 +144,38 @@ export class TrayMenu {
                         },
                     },
                 ],
+            },
+            {
+                label: "Avatar Size",
+                submenu: [100, 80, 65, 50].map((s) => ({
+                    label: `${s}px`,
+                    type: "radio",
+                    checked: settingsManager.get("size") === s,
+                    click: () => {
+                        settingsManager.set("size", s);
+                    },
+                })),
+            },
+            {
+                label: "Launch on Startup",
+                toolTip: "Launch the program when Windows starts",
+                type: "checkbox",
+                checked: settingsManager.get("launchOnStartup"),
+                click: () => {
+                    const newAutoLaunch =
+                        !settingsManager.get("launchOnStartup");
+                    settingsManager.set("launchOnStartup", newAutoLaunch);
+
+                    const autoLaunch = new AutoLaunch({
+                        name: "PH Voice Overlay",
+                    });
+
+                    if (newAutoLaunch) {
+                        autoLaunch.enable().catch(log.error);
+                    } else {
+                        autoLaunch.disable().catch(log.error);
+                    }
+                },
             },
             {
                 label: "About",
