@@ -20,7 +20,7 @@ export class TrayMenu {
         const iconPath =
             process.platform === "win32"
                 ? `${!isDev ? "/dist" : ""}/assets/iconTemplateWin.png`
-                : "/assets/iconTemplate.png";
+                : "/dist/assets/iconTemplate.png";
         const imagePath = path.join(app.getAppPath(), iconPath);
         log.info(imagePath);
         const image = nativeImage.createFromPath(imagePath);
@@ -31,13 +31,16 @@ export class TrayMenu {
     createMenu(): Menu {
         const contextMenu = Menu.buildFromTemplate([
             {
-                label: "Show Overlay URL",
+                label: "Show Overlay Path",
                 type: "normal",
                 click: () => {
                     prompt({
-                        title: "URL for Browser Source",
-                        label: "Copy URL:",
-                        value: "http://localhost:8923/overlay/",
+                        title: "Path for Browser Source",
+                        label: "Copy Path:",
+                        value: path.join(
+                            app.getPath("userData"),
+                            "overlay.html"
+                        ),
                         inputAttrs: {
                             type: "url",
                             disabled: true as any,
@@ -50,7 +53,7 @@ export class TrayMenu {
                             dialog.showMessageBox({
                                 title: "Info",
                                 message:
-                                    "Make sure to set the Browser Source dimensions to the same as your stream canvas (ie 1280x720)",
+                                    "Make sure to check 'Local File' and set the Browser Source dimensions to the same as your stream canvas (ie 1280x720)",
                             });
                         });
                 },

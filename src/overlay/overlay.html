@@ -1,0 +1,31 @@
+<!--
+	WRAPPER FOR THE OVERLAY. 
+	IT ENSURES THE OVERLAY LOADS EVEN IF BROADCASTING SOFTWARE IS OPENED BEFORE THE APP.
+	THIS FILE GETS REGENERATED ON EVERY APP RESTART.
+
+	v1.0.0
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PH Discord Voice Overlay</title>
+    </head>
+    <body>
+        <script>
+            const OVERLAY_URL = "http://localhost:8923/overlay";
+            (function waitForOverlay() {
+                fetch(OVERLAY_URL)
+                    .then((response) => {
+                        if (response.ok) {
+                            location.href = OVERLAY_URL;
+                            return;
+                        }
+                        setTimeout(waitForOverlay, 1000);
+                    })
+                    .catch(() => {
+                        setTimeout(waitForOverlay, 1000);
+                    });
+            })();
+        </script>
+    </body>
+</html>

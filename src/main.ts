@@ -8,6 +8,7 @@ import { TrayMenu } from "./TrayMenu";
 import { discordManager } from "./DiscordManager";
 import { webServerManager } from "./WebServerManager";
 import { settingsManager } from "./SettingsManager";
+import { copyOverlayWrapperToUserDataFolder } from "./utils";
 
 autoUpdater.logger = log;
 (autoUpdater.logger as typeof log).transports.file.level = "info";
@@ -26,6 +27,8 @@ log.info("PH Voice Activity starting...");
     app.dock?.hide();
 
     app.whenReady().then(() => {
+        copyOverlayWrapperToUserDataFolder();
+
         webServerManager.start();
 
         appManager.setTray(new TrayMenu());
