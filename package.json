@@ -1,7 +1,7 @@
 {
     "name": "ph-discord-activity-overlay",
     "productName": "PotionHoarders Discord Activity Overlay",
-    "version": "1.2.1",
+    "version": "1.2.0",
     "description": "Small app which sends discord voice events to an overlay for PotionHoarders",
     "main": "./dist/main.js",
     "scripts": {
