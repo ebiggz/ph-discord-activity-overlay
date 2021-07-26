@@ -34,9 +34,9 @@ log.info('PH Voice Activity starting...');
 
             autoUpdater.checkForUpdates();
 
-            setInterval(() => {
-                autoUpdater.checkForUpdates();
-            }, 60 * 60 * 1000  /* every hour */);
+            // setInterval(() => {
+            //     autoUpdater.checkForUpdates();
+            // }, 60 * 60 * 1000  /* every hour */);
 
             const autoLaunch = new AutoLaunch({
                 name: "PH Voice Overlay"
