@@ -1,12 +1,11 @@
 import { app, Tray, Menu, nativeImage, dialog } from "electron";
+import path from "path";
 import prompt from "electron-prompt";
 import { HOARDERS } from "./constants";
 import { settingsManager } from "./SettingsManager";
 
 export class TrayMenu {
     public readonly tray: Tray;
-
-    private iconPath: string = "/assets/iconTemplate.png";
 
     constructor() {
         this.tray = new Tray(this.createNativeImage());
@@ -15,8 +14,12 @@ export class TrayMenu {
     }
 
     createNativeImage() {
-        const path = `${app.getAppPath()}${this.iconPath}`;
-        const image = nativeImage.createFromPath(path);
+        const iconPath =
+            process.platform === "win32"
+                ? "/assets/iconTemplateWin.png"
+                : "/dist/assets/iconTemplate.png";
+        const imagePath = path.join(app.getAppPath(), iconPath);
+        const image = nativeImage.createFromPath(imagePath);
         image.setTemplateImage(true);
         return image;
     }
@@ -28,15 +31,17 @@ export class TrayMenu {
                 type: "normal",
                 click: () => {
                     prompt({
-                        title: 'URL for Browser Source',
-                        label: 'URL:',
-                        value: 'http://localhost:8923/overlay/',
+                        title: "URL for Browser Source",
+                        label: "URL:",
+                        value: "http://localhost:8923/overlay/",
                         inputAttrs: {
-                            type: 'url',
-                            disabled: true as any
+                            type: "url",
+                            disabled: true as any,
                         },
-                        type: 'input',
-                    }).then(console.log).catch(console.log)
+                        type: "input",
+                    })
+                        .then(console.log)
+                        .catch(console.log);
                 },
             },
             {
@@ -130,9 +135,12 @@ export class TrayMenu {
                 ],
             },
             {
+                label: "About",
+                role: "about",
+            },
+            {
                 label: "Quit",
-                type: "normal",
-                click: () => app.quit(),
+                role: "quit",
             },
         ]);
         return contextMenu;

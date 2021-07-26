@@ -2,6 +2,7 @@ import http from "http";
 import WebSocket, { AddressInfo } from "ws";
 import express from "express";
 import cors from "cors";
+import log from "electron-log";
 import { settingsManager } from "./SettingsManager";
 
 class WebServerManager {
@@ -14,20 +15,6 @@ class WebServerManager {
         this.expressApp.use(cors());
 
         this.expressApp.use("/overlay", express.static(__dirname + "/overlay"));
-
-        // this.expressApp.get("/overlay", (_, res) => {
-        //     res.sendFile(__dirname + "/overlay/index.html");
-        // });
-
-        try {
-            this.server = this.httpServer.listen(8923);
-            console.info(
-                "Web Server listening on port %s.",
-                (this.server.address() as AddressInfo).port
-            );
-        } catch (err) {
-            console.error(err);
-        }
 
         settingsManager.on("settingsUpdated", (settings) => {
             this.sendWebsocketMessage({
@@ -53,11 +40,23 @@ class WebServerManager {
             if (client.readyState === 1) {
                 client.send(rawData, (err) => {
                     if (err) {
-                        console.error(err);
+                        log.error(err);
                     }
                 });
             }
         });
+    }
+
+    start() {
+        try {
+            this.server = this.httpServer.listen(8923);
+            log.info(
+                "Web Server listening on port %s.",
+                (this.server.address() as AddressInfo).port
+            );
+        } catch (err) {
+            log.error(err);
+        }
     }
 }
 

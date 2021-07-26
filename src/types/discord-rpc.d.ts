@@ -114,7 +114,7 @@ declare module "discord-rpc" {
         destroy(): Promise<void>;
 
         on<Data = any>(
-            event: "ready" | "connected" | RPCEvents,
+            event: "ready" | "connected" | "disconnected" | RPCEvents,
             listener: (data?: Data) => void
         ): this;
         once(event: "ready" | "connected", listener: () => void): this;

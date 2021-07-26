@@ -1,4 +1,5 @@
 import DiscordRPC from "discord-rpc";
+import log from "electron-log";
 import { webServerManager } from "./WebServerManager";
 import {
     CLIENT_ID,
@@ -45,14 +46,14 @@ class DiscordManager {
     constructor() {
         this.client = new DiscordRPC.Client({ transport: "ipc" });
 
-        this.client.on("ready", async () => {
-            // (this.client as any).transport.on("message", (message: any) =>
-            //    console.log("IPC MESSAGE DEBUG", message)
-            // );
+        this.client.on("disconnected", () => {
+            this.triggerReconnect();
+        });
 
+        this.client.on("ready", async () => {
             for (const speakingEvent of CHANNEL_SPEAKING_EVENTS) {
                 this.client.on<{ user_id: string }>(speakingEvent, (data) => {
-                    console.log(speakingEvent, data);
+                    log.info(speakingEvent, data);
                     if (!HOARDERS.some((h) => h.id === data?.user_id)) return;
 
                     const user = this.channelUsers.find(
@@ -70,7 +71,7 @@ class DiscordManager {
                 this.client.on<DiscordRPC.VoiceState>(
                     voiceStateEvent,
                     (data) => {
-                        console.log(voiceStateEvent, data);
+                        log.info(voiceStateEvent, data);
                         if (
                             data == null ||
                             !HOARDERS.some((h) => h.id === data.user.id)
@@ -132,7 +133,7 @@ class DiscordManager {
                 );
             });
 
-            console.log("Connected to Discord");
+            log.info("Connected to Discord");
         });
 
         this.client.on("VOICE_CHANNEL_SELECT", () => {
@@ -155,7 +156,7 @@ class DiscordManager {
                 await subscription.unsubscribe();
             }
         } catch (e) {
-            console.log("Error unsubscribing from voice channel events", e);
+            log.info("Error unsubscribing from voice channel events", e);
         }
 
         this.channelEventSubscriptions = [];
@@ -170,8 +171,8 @@ class DiscordManager {
 
             // only consider a channel selected if it's in the server we're interested in
             if (
-                channel == null /*||
-                channel.guild_id !== POTION_HOARDERS_SERVER_ID*/
+                channel == null ||
+                channel.guild_id !== POTION_HOARDERS_SERVER_ID
             )
                 return;
 
@@ -184,8 +185,16 @@ class DiscordManager {
                 this.channelEventSubscriptions.push(subscription);
             }
         } catch (e) {
-            console.log("Error getting current voice channel", e);
+            log.info("Error getting current voice channel", e);
         }
+    }
+
+    private triggerReconnect() {
+        (this.client as any)._connectPromise = undefined;
+        log.info("Attempting to reconnect to Discord in 30 secs...");
+        setTimeout(() => {
+            this.connect();
+        }, 30 * 1000);
     }
 
     async connect() {
@@ -198,7 +207,10 @@ class DiscordManager {
                 // prevents oauth modal from showing every time (ie only show it once)
                 prompt: "none",
             } as any)
-            .catch(console.error);
+            .catch((err) => {
+                log.warn(err);
+                this.triggerReconnect();
+            });
     }
 }
 

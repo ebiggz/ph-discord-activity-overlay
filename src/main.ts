@@ -1,29 +1,80 @@
 import { app } from "electron";
+import { autoUpdater } from "electron-updater";
+import log from "electron-log";
 import AutoLaunch from "auto-launch";
+import isDev from "electron-is-dev";
 import { appManager } from "./AppManager";
 import { TrayMenu } from "./TrayMenu";
 import { discordManager } from "./DiscordManager";
+import { webServerManager } from "./WebServerManager";
 
-app.dock?.hide();
+autoUpdater.logger = log;
+(autoUpdater.logger as typeof log).transports.file.level = 'info';
 
-app.whenReady().then(() => {
-    appManager.setTray(new TrayMenu());
+log.info('PH Voice Activity starting...');
 
-    const autoLaunch = new AutoLaunch({
-        name: "PH Voice Activity Overlay",
-        path: app.getPath("exe"),
+(function start() {
+    // ensure only a single instance of the app runs
+    const gotTheLock = app.requestSingleInstanceLock();
+    if (!gotTheLock) {
+        app.quit();
+        return;
+    }
+
+    //needed on mac
+    app.dock?.hide();
+
+    app.whenReady().then(() => {
+
+        if(!isDev) {
+            autoUpdater.checkForUpdates();
+        }
+
+        webServerManager.start();
+
+        appManager.setTray(new TrayMenu());
+
+        if (!isDev) {
+            const autoLaunch = new AutoLaunch({
+                name: "PH Voice Overlay"
+            });
+
+            autoLaunch
+                .isEnabled()
+                .then((isEnabled) => {
+                    if (!isEnabled) autoLaunch.enable();
+                })
+                .catch(() => log.info("Couldn't enable auto-launch."));
+        }
+
+        discordManager.connect();
     });
 
-    autoLaunch
-        .isEnabled()
-        .then((isEnabled) => {
-            if (!isEnabled) autoLaunch.enable();
-        })
-        .catch(() => console.log("Couldn't auto-launch."));
+    app.on("window-all-closed", () => {/* do nothing */});
 
-    discordManager.connect();
-});
+    autoUpdater.on('checking-for-update', () => {
+        log.info("Checking for updates...");
+    });
 
-app.on("window-all-closed", () => {
-    // do nothing
-});
+    autoUpdater.on('update-available', (info) => {
+        log.info("Update available!", info);
+    });
+
+    autoUpdater.on('update-not-available', (info) => {
+        log.info("Update not available.", info);
+    });
+
+    autoUpdater.on('error', (err) => {
+        log.error("Update error", err);
+    });
+
+    autoUpdater.on('download-progress', (progressObj) => {
+        log.info("Update progress", progressObj)
+    });
+
+    autoUpdater.on('update-downloaded', (info) => {
+        log.info("Update downloaded!", info);
+        autoUpdater.quitAndInstall();  
+    });
+
+})();
