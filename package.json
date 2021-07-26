@@ -5,11 +5,12 @@
     "description": "Small app which sends discord voice events to an overlay for PotionHoarders",
     "main": "./dist/main.js",
     "scripts": {
-        "start": "webpack --config ./webpack.config.js && electron .",
+        "compile": "webpack --config ./webpack.config.js",
+        "start": "npm run compile && electron .",
         "electron:dev": "nodemon",
         "dev": "concurrently --kill-others \"npm run electron:dev\"",
-        "build": "electron-builder --win -p never",
-        "publish": "electron-builder --win -p always"
+        "build": "npm run compile && electron-builder --win -p never",
+        "publish": "npm run compile && electron-builder --win -p always"
     },
     "repository": "https://github.com/ebiggz/ph-discord-activity-overlay",
     "keywords": [
