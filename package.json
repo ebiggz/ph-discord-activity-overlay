@@ -50,7 +50,7 @@
         "cors": "^2.8.5",
         "discord-rpc": "^4.0.1",
         "electron-is-dev": "^2.0.0",
-        "electron-log": "^4.4.0",
+        "electron-log": "^4.4.3",
         "electron-prompt": "^1.6.2",
         "electron-updater": "^4.3.9",
         "express": "^4.17.1",
