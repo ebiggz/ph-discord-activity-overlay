@@ -19,9 +19,9 @@ export const HOARDERS = [
         label: "Phantom",
     },
     {
-        id: "144047360434110464",
+        id: "90668336777547776",
         goblin: "knight",
-        label: "Setari",
+        label: "StormTheBard",
     },
     {
         id: "116635278935982083",
